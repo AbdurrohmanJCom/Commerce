@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Bids for: {{ listing.title }}</h2>
+
+    {% for bid in listing.bids.all %}
+        <div>
+            <h5>{{ bid.amount }}</h5>
+            <p>Bidder: {{ bid.bidder }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div>
+        {% if listing.is_active and user == listing.owner %}
+            <a href="{% url 'close_listing' listing.id %}">Close</a>
+            
+        {% else %}    
+            <p>Listing is closed.</p>
+        {% endif %}
+        <h2>Listing: {{listing.title}}</h2>
+        {% if user.is_authenticated %}
+            <form action="{% url 'listing_detail' listing.id %}">
+                
+            </form>
+        {% endif %}
+        <div class="listing_image">
+            <img src="{{listing.image_url}}" alt="listing_url">
+        </div>
+        <div>
+            <p class="description">{{listing.description}}</p>
+        </div>
+        <div>
+            <h4>Starting price: ${{listing.price}}</h4>
+            {% if max_bid %}
+                <h4>Max bid: ${{max_bid |floatformat:2}}</h4>
+            {% endif %}
+        </div>
+        <p><a href="{% url 'bids_for_listing' listing.id %}">{{bids_len}} bid(s)</a> so far. {% if is_current_bidder %}Your bid is the current bid. {% endif %}</p>
+        {% if user.is_authenticated and not is_current_bidder %}
+            <p>{{message}}</p>
+            <form action="{% url 'listing_detail' listing.id %}" method="post">
+                {% csrf_token %}
+                <div>
+                    <input type="number" name="bid_amount" min="{{min_bid_amount}}" max="999999" step=".01" placeholder="Bid" value="{{min_bid_amount |floatformat:2}}">
+                </div>
+                <input type="submit" value="Place Bid">
+            </form>
+        {% endif %}
+
+        <h5>Details</h5>
+        <ul>
+            <li>Listed by: <a href="">{{listing.owner}}</a></li>
+            <li>Category: <a href="">{{listing.category}}</a></li>
+        </ul>
+
+    </div>
+{% endblock %}
