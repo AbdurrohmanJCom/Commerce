@@ -18,9 +18,15 @@ body {
 }
 
 .listing_item_image img {
-    max-width: 100%;
+    max-width: 80%;
     width: auto;
     height: auto;
+    /*width: 400px;*/
+    /*height: 250px;*/
+}
+
+.description{
+    font-size: 13px;
 }
 
 .listing_item_info {
@@ -34,3 +40,4 @@ body {
 .listing_image img {
     height: 100%;
 }
+

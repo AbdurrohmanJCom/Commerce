@@ -9,11 +9,13 @@
                 <img src="{{listing.image_url}}" alt="Listing Image">
             </div>
             <div class="listing_item_info">
-                <h5><a href="{% url 'listing_detail' listing.id %}">{{listing.title}}</a></h5>
+                <h3><a href="{% url 'listing_detail' listing.id %}">{{listing.title}}</a></h3>
                 <p><strong>Price:</strong> ${{listing.price}}</p>
-                {% if listing.description %}
-                    <p>{{listing.description}}</p>
-                {% endif %}
+                <div class="description">
+                    {% if listing.description %}
+                        <p class="description">{{listing.description}}</p>
+                    {% endif %}
+                </div>
                 <p>Created {{listing.date_created}}</p>
             </div>
         </div>

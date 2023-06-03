@@ -1,10 +1,26 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h1>My Activities</h1>
-    {% for i in listings %}
-        <ul>
-            <li>${{i.owner}}</li>
-        </ul>
+  <h1>User Activities</h1>
+
+  <h2>My Listings</h2>
+  <ul>
+    {% for listing in listings %}
+      <li><a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a></li>
+    {% empty %}
+      <li>No listings found.</li>
     {% endfor %}
+  </ul>
+
+  <h2>My Bidding Activities</h2>
+  <ul>
+    {% for bid in bids %}
+      <li>
+        <a href="{% url 'listing_detail' bid.listing.id %}">{{ bid.listing.title }}</a>
+        - My bid: {{ bid.amount }}
+      </li>
+    {% empty %}
+      <li>No bidding activities found.</li>
+    {% endfor %}
+  </ul>
 {% endblock %}

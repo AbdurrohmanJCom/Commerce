@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django import forms
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -164,8 +165,22 @@ def close_listing(request, id):
 
 
 def user_activities(request):
-    listing = Listing.objects.all()
+    # Получение всех листингов и ставок, связанных с пользователем
+    listings = Listing.objects.filter(owner=request.user)
+    bids = Bid.objects.filter(bidder=request.user)
+
+    # Получение имен листингов
+    listing_names = [listing.title for listing in listings]
+    bidding_listing_names = [bid.listing.title for bid in bids]
+
+    # Получение ставок пользователя
+    user_bids = [bid.amount for bid in bids]
 
     return render(request, 'auctions/user_activities.html', {
-        'listings': listing
+        'listings': listings,
+        'bids': bids,
+        'listing_names': listing_names,
+        'bidding_listing_names': bidding_listing_names,
+        'user_bids': user_bids,
     })
+
