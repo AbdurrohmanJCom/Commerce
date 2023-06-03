@@ -2,9 +2,10 @@ from decimal import Decimal
 from django import forms
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.db.models import Max
 
@@ -106,47 +107,43 @@ def create_listing(request):
 
 
 def listing_detail(request, id):
+    comments = Comment.objects.filter(listing_id=id)
     listing = Listing.objects.get(id=id)
+    max_bid = listing.bids.aggregate(max_price=Max("amount"))['max_price']
     last_bid = listing.bids.last()
     is_current_bidder = False
-
     if last_bid is not None:
         is_current_bidder = last_bid.bidder == request.user
-
-    message = ''
-    max_bid = listing.bids.aggregate(amount_max=Max('amount'))['amount_max']
     if max_bid is not None:
         min_bid_amount = max_bid + 10
     else:
         min_bid_amount = listing.price
-
+    message = ''
     if request.method == 'POST':
-        bid_amount = Decimal(request.POST['bid_amount'])
-
-        print(bid_amount)
-        print(min_bid_amount)
-
-        print(bid_amount.__class__.__name__)
-        print(min_bid_amount.__class__.__name__)
-
-        print(min_bid_amount == bid_amount)
-
-        if bid_amount < min_bid_amount:
-            message = f'Min bid amount is {min_bid_amount}'
-        else:
-            Bid(
+        if request.POST.get('bid_amount'):
+            bid_amount = Decimal(request.POST['bid_amount'])
+            if bid_amount < min_bid_amount:
+                message = f'Min bid amount is {round(min_bid_amount, 2)}'
+            else:
+                Bid(
+                    listing=listing,
+                    bidder=request.user,
+                    amount=bid_amount
+                ).save()
+        if request.POST.get('comment'):
+            Comment(
+                owner=request.user,
                 listing=listing,
-                bidder=request.user,
-                amount=bid_amount
+                text=request.POST['comment'],
             ).save()
-
     return render(request, 'auctions/listing_detail.html', {
         'listing': listing,
         'bids_len': len(listing.bids.all()),
+        'comments': comments,
         'max_bid': max_bid,
         'min_bid_amount': min_bid_amount,
         'message': message,
-        'is_current_bidder': is_current_bidder
+        'is_current_bidder': is_current_bidder,
     })
 
 
@@ -183,4 +180,45 @@ def user_activities(request):
         'bidding_listing_names': bidding_listing_names,
         'user_bids': user_bids,
     })
+
+
+def watchlist(request, id):
+    user_watchlist = Favorite.objects.filter(user_id=id)
+    current_page = Paginator(user_watchlist, 4)
+    page_number = request.GET.get('page')
+    page_obj = current_page.get_page(page_number)
+    return render(request, 'auctions/watchlist.html', {
+        'listings': page_obj,
+    })
+
+
+def add_to_favorites(request, product_id):
+    product = Listing.objects.get(pk=product_id)
+    Favorite.objects.get_or_create(user=request.user, product=product)
+    return HttpResponseRedirect(reverse("index"))
+
+
+def remove_from_favorites(request, product_id):
+    product = Listing.objects.get(pk=product_id)
+    Favorite.objects.filter(user=request.user, product=product).delete()
+    return HttpResponseRedirect(reverse("watchlist", args=(request.user.id,)))
+
+
+def categories(request):
+    categories = Category.objects.all()
+    return render(request, 'auctions/list_categories.html', {
+        'categories': categories
+    })
+
+
+def category_view(request, id):
+    category = Listing.objects.filter(category_id=id)
+    current_page = Paginator(category, 4)
+    page_number = request.GET.get('page')
+    page_obj = current_page.get_page(page_number)
+    return render(request, 'auctions/category.html', {
+        'listings': page_obj,
+    })
+
+
 

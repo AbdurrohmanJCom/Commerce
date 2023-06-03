@@ -11,7 +11,7 @@
         <h2>Listing: {{listing.title}}</h2>
         {% if user.is_authenticated %}
             <form action="{% url 'listing_detail' listing.id %}">
-                
+
             </form>
         {% endif %}
         <div class="listing_image">
@@ -37,6 +37,33 @@
                 <input type="submit" value="Place Bid">
             </form>
         {% endif %}
+
+        {% if user.is_authenticated %}
+            <div class="comment_div">
+                <form action="{% url 'listing_detail' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="comment_enter">
+                        <textarea name="comment" placeholder="comment"></textarea>
+                    </div>
+                    <div class="comment_submit">
+                        <input type="submit" value="отправить">
+                    </div>
+                </form>
+            </div>
+        {% else %}
+            <h3>Для добавления комментариев необходимо авторизоваться.</h3>
+        {% endif %}
+        </div>
+        <div>
+            <div class="comment_div">
+                {% for comment in comments %}
+                    <div class="comment">
+                        <p>{{ comment.owner }}<b>:</b></p>
+                        <p>{{ comment.text }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
 
         <h5>Details</h5>
         <ul>

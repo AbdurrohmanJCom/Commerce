@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+    {% for listing in listings %}
+        <div class="listing_item">
+            <div class="listing_item_image">
+                <img src="{{ listing.product.image_url }}" alt="ну и ну">
+            </div>
+            <div class="listing_item_info">
+                <h5><a href='{% url "listing_detail" listing.product.id %}'>{{ listing.product.title }}</a></h5>
+                <p><b>Price: </b>${{ listing.product.price }}</p>
+                {% if listing.product.description %}
+                    <p>{{ listing.product.description }}</p>
+                {% endif %}
+                <p>{{ listing.product.date_created }}</p>
+            </div>
+            <div  class="watchlist" >
+                {% if user.is_authenticated %}
+                    <a id="watchlist-a" href="{% url 'remove_from_favorites' product_id=listing.product.id %}">Избранные удаление</a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

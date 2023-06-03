@@ -23,4 +23,7 @@
       <li>No bidding activities found.</li>
     {% endfor %}
   </ul>
+  <h2>My Watchlists</h2>
+    <a href="{% url 'watchlist' id=user.id %}">Watchlist</a>
+
 {% endblock %}

@@ -21,8 +21,6 @@ body {
     max-width: 80%;
     width: auto;
     height: auto;
-    /*width: 400px;*/
-    /*height: 250px;*/
 }
 
 .description{
@@ -41,3 +39,16 @@ body {
     height: 100%;
 }
 
+.watchlist-a{
+    display: flex;
+    justify-content: flex-end;
+}
+
+b{
+    margin-left: 10px;
+    padding-right: 10px;
+}
+
+.comment{
+    display: flex;
+}

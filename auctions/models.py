@@ -52,3 +52,11 @@ class Comment(models.Model):
 
     def __str__(self) -> str:
         return f'{self.owner} -> {self.listing}'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, related_name='user_fav', on_delete=models.CASCADE)
+    product = models.ForeignKey(Listing, related_name='listing_fav', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user} -> {self.product}'
